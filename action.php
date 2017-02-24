@@ -424,7 +424,6 @@ switch ($_['action']){
 	case 'save_resource_content':
 		Action::write(function($_,&$response){
 			global $myUser;
-			
 			$resource = Resource::getByid($_['id']);
 			$sketch = Sketch::getById($resource->sketch);
 			if($myUser->id != $sketch->owner) return;

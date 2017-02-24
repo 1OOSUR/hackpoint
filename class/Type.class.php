@@ -11,13 +11,24 @@
 class Type{
 
 	public static function get($uid){
-		$t = Type::all();
-		return $t[$uid];
+		//$t = Type::all();
+	
+		require_once(__ROOT__.'resource/'.$uid.'.class.php');
+		return $uid;
 	}
 
 	public static function all(){
 		$types = array();
 
+		foreach(glob(__ROOT__.'resource/*.class.php') as $file){
+			require_once($file);
+			$className =  str_replace('.class.php','',baseName($file));
+			$infos = $className::infos();
+			$types[$className] = $className::infos();
+		}
+		
+		
+		return $types;
 
 		$types['readme'] = array(
 			'label' => 'README',
@@ -178,7 +189,13 @@ class Type{
 		return $types;
 	}
 	
-	public static function fromFileImport($file,$sketch,$type){
+	public static function fromFileImport($file,$sketch,$typeName){
+	
+	
+		$type = self::get($typeName);
+		return $type::fromFileImport($file,$sketch,$typeName);
+	
+	/*
 		$resource = new Resource();
 		$resource->sketch = $sketch->id;
 		$stream = file_get_contents($file['tmp_name']);
@@ -223,11 +240,16 @@ class Type{
 			break;
 			default:
 			break;
-		}
+		}*/
 	}
 	
 	public static function fromImport($res,$sketch){
-		global $myUser;
+		
+		
+		$type = self::get($res['type']);
+		return $type::fromImport($res,$sketch);
+		
+		/*
 		$resource = new Resource();
 		$resource->fromArray($res);
 		$resource->id = null;
@@ -304,11 +326,18 @@ class Type{
 			
 			default:
 			break;
-		}
+		}*/
 	}
 	
 	
 	public static function toExport($resource){
+	
+	
+		$type = self::get($resource->type);
+		return $type::toExport($resource);
+	
+	
+		/*
 		$resource = $resource->toArray();
 		
 		switch($resource['type']){
@@ -337,11 +366,16 @@ class Type{
 			break;
 		}
 	
-		return $resource;
+		return $resource;*/
 	}
 	
 	public static function toHtml($resource,$sketch){
 		global $myUser;
+		
+		$type = self::get($resource->type);
+		
+		return $type::toHtml($resource,$sketch);
+		/*
 		$response = array();
 		$response = $resource->toArray();
 		$type = self::get($resource->type);
@@ -425,9 +459,18 @@ class Type{
 			}
 			
 			return $response;
+		*/
 	}
 	
 	public static function toFileStream($resource){
+	
+		$type = self::get($resource->type);
+		return $type::toFileStream($resource);
+	
+	
+	
+	/*
+	
 		$type = self::get($resource->type);
 		$file = (object) array('name'=>slugify($resource->label),'content'=>'');
 		if(isset($type['extension'])) $file->name .= '.'.$type['extension'][0];
@@ -475,6 +518,7 @@ class Type{
 			break;
 		}
 		return $file;
+		*/
 	}
 	
 }
